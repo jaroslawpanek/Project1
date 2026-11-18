@@ -13,6 +13,7 @@ Komendy: `package.json` (skrypty) i `README.md`. Node: `.nvmrc`. Zmienne środow
 - **Auth**: klient w `src/lib/supabase.ts`, ochrona tras w `src/middleware.ts` (lista `PROTECTED_ROUTES`).
 - **Miejsca kodu**: serwisy i helpery w `src/lib/` (logika biznesowa w `src/lib/services/`), współdzielone typy (encje, DTO) w `src/types.ts`.
 - **Testy**: `npm run smoke` uruchamiaj po aktualizacji zależności.
+- **Wdrożenie**: Cloudflare Workers, wyłącznie `npx wrangler deploy`. Nie używaj `wrangler pages ...`. Wdrożenie na produkcję, rotację sekretów i usuwanie zasobów zatwierdza człowiek. Plan: `context/deployment/deploy-plan.md`.
 
 ## Łańcuch umiejętności 10xDevs
 
