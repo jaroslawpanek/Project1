@@ -48,12 +48,12 @@ Legenda: `[ ]` do zrobienia · `[x]` zrobione · 👤 = bramka ręczna (człowie
 - [ ] 👤 Zdecydować, czy potwierdzenie e-mail jest włączone na prod (wpływa na smoke, patrz Etap 6).
 
 ### Etap 3 — Integracja LLM (🤖 kod + 👤 klucz)
-- [ ] 👤 Wybrać dostawcę/model i założyć klucz z limitem wydatków (PRD: ochrona budżetu).
-- [ ] 🤖 Dodać `LLM_API_KEY` (secret, server) do `env.schema` w `astro.config.mjs`.
-- [ ] 🤖 Trasa `src/pages/api/...` (`POST`, `prerender = false`, walidacja zod): limit 5000 znaków (NFR), **jedno** żądanie do LLM, timeout (`AbortSignal.timeout`), parsowanie odpowiedzi z walidacją zod.
-- [ ] 🤖 Zachować tekst po stronie klienta i umożliwić ponowienie po błędzie (guardrail PRD, ryzyko H z rejestru).
+- [ ] 👤 Wybrać dostawcę/model i założyć klucz z limitem wydatków (PRD: ochrona budżetu). Dostawca: Google Gemini, model `gemini-3.5-flash` (`gemini-2.5-flash` wycofany, `gemini-3.8-flash` niedostępny dla klucza, warianty lite zwracały 503 — do ponownego testu). Klucz jest w `.dev.vars`; **limit wydatków w Google AI Studio do potwierdzenia**.
+- [x] 🤖 Dodać `LLM_API_KEY` (secret, server) do `env.schema` w `astro.config.mjs`.
+- [x] 🤖 Trasa `src/pages/api/...` (`POST`, `prerender = false`, walidacja zod): limit 5000 znaków (NFR), **jedno** żądanie do LLM, timeout (`AbortSignal.timeout`), parsowanie odpowiedzi z walidacją zod. Gotowe: `POST /api/flashcards/generate` (timeout 60 s; Gemini odpowiada w 20–67 s), `POST /api/flashcards` (zapis).
+- [x] 🤖 Zachować tekst po stronie klienta i umożliwić ponowienie po błędzie (guardrail PRD, ryzyko H z rejestru). Stan w `useFlashcardGenerator`; UI przeklikane w Chrome na lokalnym Supabase (scenariusz błędu LLM nieprzetestowany w przeglądarce).
 - [ ] 🤖 Zadbać o budżet CPU 10 ms (Free): bez ciężkiego parsowania w Workerze; czas oczekiwania na `fetch` nie liczy się jako CPU, ale parsowanie/serializacja tak.
-- [ ] 🤖 Limit subrequestów Free = 50/wywołanie: policzyć (getUser + zapisy + LLM) — z zapasem.
+- [x] 🤖 Limit subrequestów Free = 50/wywołanie: policzyć (getUser + zapisy + LLM) — z zapasem. Generowanie: getUser + 1 LLM = 2; zapis: getUser + 1 insert = 2.
 
 ### Etap 4 — Sekrety i zmienne (👤 + 🤖)
 - [ ] 🤖 Lokalnie: `.dev.vars` z `SUPABASE_URL`, `SUPABASE_KEY`, `LLM_API_KEY` (nie commitować).

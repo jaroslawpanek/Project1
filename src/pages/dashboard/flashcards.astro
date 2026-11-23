@@ -1,0 +1,45 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { createClient } from "@/lib/supabase";
+
+// /dashboard/* is protected in src/middleware.ts; RLS limits rows to the signed-in user.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const { data, error } = supabase
+  ? await supabase.from("flashcards").select("id, front, back").order("created_at", { ascending: false })
+  : { data: null, error: { message: "Supabase is not configured" } };
+const flashcards = data ?? [];
+---
+
+<Layout title="Moje fiszki">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-3xl space-y-6 rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+      <div class="flex items-center justify-between gap-4">
+        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+          Moje fiszki
+        </h1>
+        <a href="/dashboard" class="text-sm text-blue-100/80 underline">
+          Generuj nowe
+        </a>
+      </div>
+
+      {error && (
+        <p role="alert" class="rounded-lg border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-200">
+          Nie udało się wczytać fiszek.
+        </p>
+      )}
+
+      {!error && flashcards.length === 0 && (
+        <p class="text-blue-100/70">Nie masz jeszcze fiszek. Wygeneruj pierwsze z wklejonego tekstu.</p>
+      )}
+
+      <ul class="space-y-3">
+        {flashcards.map((card) => (
+          <li class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <p class="font-medium">{card.front}</p>
+            <p class="mt-2 text-sm text-blue-100/70">{card.back}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</Layout>
