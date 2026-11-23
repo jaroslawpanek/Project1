@@ -1,11 +1,15 @@
 import { z } from "zod";
 import type { FlashcardProposalDto } from "@/types";
 
-// Gemini model used for generation. Swap here if a newer Flash model is preferred.
-const MODEL = "gemini-3.5-flash";
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-const TIMEOUT_MS = 60_000;
+// Models are tried in order. The fallback is used only when the previous model is overloaded or times out
+// (Gemini returns intermittent 503s under high demand). Swap names here if newer models are preferred.
+const MODELS = ["gemini-3.5-flash", "gemini-3.5-flash-lite"] as const;
+const endpoint = (model: string) => `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+// Per attempt. Worst case (every attempt times out) is MODELS.length * ATTEMPT_TIMEOUT_MS, so keep it under ~60 s total.
+const ATTEMPT_TIMEOUT_MS = 30_000;
 const MAX_PROPOSALS = 20;
+// HTTP statuses that mean "try the next model": rate limit and overload / gateway problems.
+const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
 
 const SYSTEM_PROMPT =
   "You create study flashcards from the user's source text. " +
@@ -35,17 +39,19 @@ export class GenerationError extends Error {
   constructor(
     message: string,
     readonly status: 502 | 504 | 500 = 502,
+    /** true when trying another model may help (overload, timeout, network). */
+    readonly retryable = false,
   ) {
     super(message);
     this.name = "GenerationError";
   }
 }
 
-/** One request to Gemini; returns validated flashcard proposals. Throws GenerationError. */
-export async function generateFlashcards(sourceText: string, apiKey: string): Promise<FlashcardProposalDto[]> {
+/** One request to one model; returns validated proposals. Throws GenerationError. */
+async function requestModel(model: string, sourceText: string, apiKey: string): Promise<FlashcardProposalDto[]> {
   let res: Response;
   try {
-    res = await fetch(ENDPOINT, {
+    res = await fetch(endpoint(model), {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
@@ -69,18 +75,18 @@ export async function generateFlashcards(sourceText: string, apiKey: string): Pr
           },
         },
       }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
     });
   } catch (err) {
     if (err instanceof DOMException && (err.name === "TimeoutError" || err.name === "AbortError")) {
-      throw new GenerationError("Generation timed out", 504);
+      throw new GenerationError("Generation timed out", 504, true);
     }
-    throw new GenerationError("Could not reach the model");
+    throw new GenerationError("Could not reach the model", 502, true);
   }
 
   if (!res.ok) {
     // Never forward the provider body to the client (may contain request details).
-    throw new GenerationError(`Model returned status ${res.status}`);
+    throw new GenerationError(`Model returned status ${res.status}`, 502, RETRYABLE_STATUSES.has(res.status));
   }
 
   const body = geminiResponseSchema.safeParse(await res.json().catch(() => null));
@@ -97,4 +103,22 @@ export async function generateFlashcards(sourceText: string, apiKey: string): Pr
   if (!parsed.success) throw new GenerationError("Model response did not match the expected format");
 
   return parsed.data.flashcards;
+}
+
+/**
+ * Generates flashcard proposals. Tries MODELS in order and moves to the next one only on a
+ * retryable failure (overload / timeout / network). Throws the last GenerationError otherwise.
+ */
+export async function generateFlashcards(sourceText: string, apiKey: string): Promise<FlashcardProposalDto[]> {
+  let lastError: GenerationError | undefined;
+  for (const model of MODELS) {
+    try {
+      return await requestModel(model, sourceText, apiKey);
+    } catch (err) {
+      if (!(err instanceof GenerationError)) throw err;
+      lastError = err;
+      if (!err.retryable) break;
+    }
+  }
+  throw lastError ?? new GenerationError("No model available");
 }
