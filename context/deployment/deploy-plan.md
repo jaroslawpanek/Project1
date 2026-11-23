@@ -32,17 +32,17 @@ Legenda: `[ ]` do zrobienia · `[x]` zrobione · 👤 = bramka ręczna (człowie
 - [x] Poprawić `deployment_target` w `tech-stack.md` na Workers (albo odnotować rozbieżność) — żeby agent nie użył `wrangler pages`.
 - [x] Dopisać do `CLAUDE.md` regułę: wdrażamy **tylko** `npx wrangler deploy`; `wrangler pages ...` zabronione (ryzyko z rejestru, M/H).
 - [x] Dodać `SUPABASE_*` i przyszły `LLM_API_KEY` do `.env.example`; dodać `.dev.vars` do `.gitignore` (sprawdzić, czy już jest).
-- [ ] Sprawdzić `site` w `astro.config.mjs` (`@astrojs/sitemap` wymaga go; ustawić po poznaniu domeny `*.workers.dev`).
+- [x] Sprawdzić `site` w `astro.config.mjs` (`@astrojs/sitemap` wymaga go; ustawić po poznaniu domeny `*.workers.dev`). Ustawione: `https://flashgen.jaroslaw-panek.workers.dev`.
 
 ### Etap 1 — Konto i dostęp Cloudflare (👤 + 🤖)
-- [ ] 👤 Założyć/zalogować konto Cloudflare, zanotować subdomenę `workers.dev`.
-- [ ] 👤 `npx wrangler login` (lokalnie) **albo** utworzyć token API ograniczony do jednego projektu Workers (Workers Scripts: Edit; bez DNS, bez rozliczeń) — trzymać w zmiennej env, nie w repo ani `.mcp.json`.
-- [ ] 🤖 `npx wrangler whoami` — potwierdzić konto i zakres.
+- [x] 👤 Założyć/zalogować konto Cloudflare, zanotować subdomenę `workers.dev`. Subdomena: `jaroslaw-panek.workers.dev`.
+- [x] 👤 `npx wrangler login` (lokalnie) **albo** utworzyć token API ograniczony do jednego projektu Workers (Workers Scripts: Edit; bez DNS, bez rozliczeń) — trzymać w zmiennej env, nie w repo ani `.mcp.json`.
+- [x] 🤖 `npx wrangler whoami` — potwierdzić konto i zakres. Zalogowano OAuth, Account ID `632700f7568b5f638dc54432c2929cda`.
 
 ### Etap 2 — Supabase produkcyjny (👤 + 🤖)
-- [ ] 👤 Utworzyć projekt prod (region możliwie blisko użytkownika; Workers i tak idą z edge'u — ograniczyć liczbę zapytań).
-- [ ] 🤖 Przygotować migracje w `supabase/migrations/` dla tabeli fiszek z **RLS** i politykami osobno per operacja/rola (guardrail PRD: fiszki jednego użytkownika niewidoczne dla innych). Dziś w repo nie ma migracji.
-- [ ] 🛑 Zastosować migracje na prod (`supabase db push`) po przeglądzie; wiadomo, że rollback Workera ich nie cofa — każda migracja musi być wstecznie kompatybilna z poprzednią wersją Workera.
+- [x] 👤 Utworzyć projekt prod (region możliwie blisko użytkownika; Workers i tak idą z edge'u — ograniczyć liczbę zapytań). Projekt: `qrqrhonibcyfzhxsjqfn`.
+- [x] 🤖 Przygotować migracje w `supabase/migrations/` dla tabeli fiszek z **RLS** i politykami osobno per operacja/rola (guardrail PRD: fiszki jednego użytkownika niewidoczne dla innych). Gotowe: `20261123120000_create_flashcards.sql` (przetestowana lokalnie: `scripts/test-rls.mjs`, 13/13).
+- [x] 🛑 Zastosować migracje na prod (`supabase db push`) po przeglądzie; wiadomo, że rollback Workera ich nie cofa — każda migracja musi być wstecznie kompatybilna z poprzednią wersją Workera. Zastosowano 2026-11-23 (`db push --linked`), `migration list` potwierdza local = remote.
 - [ ] 👤 Auth → URL Configuration: **Site URL = adres prod** (nie localhost, bez wildcardów); dodać dokładne Redirect URLs. Źródło: [Supabase Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
 - [ ] 🤖 Zdecydować o `emailRedirectTo` w `signup.ts` i trasie `/auth/callback` z `exchangeCodeForSession` (dziś link z maila trafia na Site URL, użytkownik potwierdzony, ale niezalogowany — akceptowalne w MVP, ale świadomie).
 - [ ] 👤 Zdecydować, czy potwierdzenie e-mail jest włączone na prod (wpływa na smoke, patrz Etap 6).
