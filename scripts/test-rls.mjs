@@ -67,7 +67,12 @@ check("A cannot reassign row to B", !!steal.error, steal.error?.code);
 
 // anon: no read, no insert
 const selAnon = await anon.from("flashcards").select("id");
-check("anon sees 0 rows", !selAnon.error && selAnon.data.length === 0);
+// Either no privilege at all (42501, hosted default) or RLS returning no rows (local default) is safe.
+check(
+  "anon sees no rows",
+  selAnon.error?.code === "42501" || (!selAnon.error && selAnon.data.length === 0),
+  selAnon.error?.code,
+);
 const insAnon = await anon.from("flashcards").insert({ front: "x", back: "y" });
 check("anon cannot insert", !!insAnon.error, insAnon.error?.code);
 
