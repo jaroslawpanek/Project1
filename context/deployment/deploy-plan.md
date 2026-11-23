@@ -48,7 +48,7 @@ Legenda: `[ ]` do zrobienia · `[x]` zrobione · 👤 = bramka ręczna (człowie
 - [ ] 👤 Zdecydować, czy potwierdzenie e-mail jest włączone na prod (wpływa na smoke, patrz Etap 6).
 
 ### Etap 3 — Integracja LLM (🤖 kod + 👤 klucz)
-- [ ] 👤 Wybrać dostawcę/model i założyć klucz z limitem wydatków (PRD: ochrona budżetu). Dostawca: Google Gemini, model `gemini-3.5-flash` (`gemini-2.5-flash` wycofany, `gemini-3.8-flash` niedostępny dla klucza, warianty lite zwracały 503 — do ponownego testu). Klucz jest w `.dev.vars`; **limit wydatków w Google AI Studio do potwierdzenia**.
+- [x] 👤 Wybrać dostawcę/model i założyć klucz z limitem wydatków (PRD: ochrona budżetu). Limit wydatków w Google AI Studio ustawiony (potwierdził użytkownik). Dostawca: Google Gemini, model `gemini-3.5-flash` (`gemini-2.5-flash` wycofany, `gemini-3.8-flash` niedostępny dla klucza, warianty lite zwracały 503 — do ponownego testu). Klucz jest w `.dev.vars`.
 - [x] 🤖 Dodać `LLM_API_KEY` (secret, server) do `env.schema` w `astro.config.mjs`.
 - [x] 🤖 Trasa `src/pages/api/...` (`POST`, `prerender = false`, walidacja zod): limit 5000 znaków (NFR), **jedno** żądanie do LLM, timeout (`AbortSignal.timeout`), parsowanie odpowiedzi z walidacją zod. Gotowe: `POST /api/flashcards/generate` (timeout 60 s; Gemini odpowiada w 20–67 s), `POST /api/flashcards` (zapis).
 - [x] 🤖 Zachować tekst po stronie klienta i umożliwić ponowienie po błędzie (guardrail PRD, ryzyko H z rejestru). Stan w `useFlashcardGenerator`; UI przeklikane w Chrome na lokalnym Supabase (scenariusz błędu LLM nieprzetestowany w przeglądarce).
@@ -56,20 +56,20 @@ Legenda: `[ ]` do zrobienia · `[x]` zrobione · 👤 = bramka ręczna (człowie
 - [x] 🤖 Limit subrequestów Free = 50/wywołanie: policzyć (getUser + zapisy + LLM) — z zapasem. Generowanie: getUser + 1 LLM = 2; zapis: getUser + 1 insert = 2.
 
 ### Etap 4 — Sekrety i zmienne (👤 + 🤖)
-- [ ] 🤖 Lokalnie: `.dev.vars` z `SUPABASE_URL`, `SUPABASE_KEY`, `LLM_API_KEY` (nie commitować).
-- [ ] 👤 `npx wrangler secret put SUPABASE_URL`, `SUPABASE_KEY`, `LLM_API_KEY` (wartości wpisuje człowiek; agent nie widzi sekretów).
-- [ ] 🤖 `npx wrangler secret list` — potwierdzić nazwy w docelowym Workerze (dopiero po utworzeniu Workera pierwszym deployem; patrz uwaga niżej).
+- [x] 🤖 Lokalnie: `.dev.vars` z `SUPABASE_URL`, `SUPABASE_KEY`, `LLM_API_KEY` (nie commitować). Plik istnieje, jest w `.gitignore`, zawiera wartości produkcyjne Supabase i klucz Gemini.
+- [x] 👤 `npx wrangler secret put SUPABASE_URL`, `SUPABASE_KEY`, `LLM_API_KEY` (wartości wpisuje człowiek; agent nie widzi sekretów). Wgrane przez `wrangler secret bulk .dev.vars` (2026-11-23).
+- [x] 🤖 `npx wrangler secret list` — potwierdzić nazwy w docelowym Workerze (dopiero po utworzeniu Workera pierwszym deployem; patrz uwaga niżej). Potwierdzono: `LLM_API_KEY`, `SUPABASE_KEY`, `SUPABASE_URL` (`secret_text`).
 - [ ] 🤖 Zbudować z sekretami w środowisku builda (CI już przekazuje `SUPABASE_*` do `npm run build`).
 - [ ] GitHub Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `SUPABASE_URL`, `SUPABASE_KEY`.
 
 **Uwaga (znana usterka, do zweryfikowania):** otwarty issue [withastro/astro#16790](https://github.com/withastro/astro/issues/16790) zgłasza, że `astro:env/server` nie widzi zmiennych runtime'owych Workera (widoczne przez `cloudflare:workers`). Projekt używa `astro:env/server`. Plan: po pierwszym deployu sprawdzić, czy `/auth/signin` faktycznie działa na prod. Jeśli nie — w `src/lib/supabase.ts` (i `config-status.ts`) przełączyć odczyt na `import { env } from "cloudflare:workers"`. Kolejność: pierwszy deploy bez sekretów utworzy Workera, więc `secret put` robić po nim (albo użyć `wrangler secret put` — tworzy Workera, jeśli go brak; potwierdzić na `--help`).
 
 ### Etap 5 — Weryfikacja przed produkcją (🤖, bez wpływu na platformę)
-- [ ] `npm ci && npx astro sync && npm run lint && npx astro check`
-- [ ] `npm run build` (z `SUPABASE_*`)
-- [ ] `npx wrangler deploy --dry-run` — sprawdzić rozmiar paczki i wykryte bindingi (czy dodaje KV `SESSION`).
-- [ ] `npm run preview` (workerd) + `BASE_URL=http://localhost:4321 npm run smoke` na lokalnym Supabase.
-- [ ] Zdecydować o KV `SESSION`: adapter auto-provisionuje namespace przy deployu ([docs adaptera](https://docs.astro.build/en/guides/integrations-guide/cloudflare/)); sesje Astro nie są używane (auth to cookies Supabase) -> ustawić `session: false` / `cloudflare({ ... })` zgodnie z dokumentacją adaptera, aby nie tworzyć zbędnego zasobu.
+- [x] `npm ci && npx astro sync && npm run lint && npx astro check` — `astro sync` i `astro check`: 0 błędów (`npm ci` nie uruchamiano). Lint: poza ~1000 błędów `␍` (CRLF z Windowsa, istniejące w całym repo) brak błędów; do rozważenia `.gitattributes` z `eol=lf`.
+- [x] `npm run build` (z `SUPABASE_*`) — przechodzi.
+- [x] `npx wrangler deploy --dry-run` — paczka 1361 KiB (gzip 477 KiB, limit Free 3 MiB). Bindingi po zmianach: `ASSETS`, `IMAGES` (bez KV `SESSION`).
+- [x] `npm run preview` (workerd) + `npm run smoke` na lokalnym Supabase — 8/8. Uwaga: preview czyta sekrety z `dist/server/.dev.vars` (kopia z buildu), nie z bieżącego `.dev.vars`; przy buildzie z prod-wartościami smoke trafi w prod Supabase. Sekrety `astro:env/server` w workerd odczytane poprawnie (wpływ na #16790 sprawdzić dopiero na wdrożonym Workerze).
+- [x] Zdecydować o KV `SESSION`: **wyłączone** (`session: false` w `astro.config.mjs`; sesje Astro nieużywane). Oryginalna uwaga: adapter auto-provisionuje namespace przy deployu ([docs adaptera](https://docs.astro.build/en/guides/integrations-guide/cloudflare/)); sesje Astro nie są używane (auth to cookies Supabase) -> ustawić `session: false` / `cloudflare({ ... })` zgodnie z dokumentacją adaptera, aby nie tworzyć zbędnego zasobu.
 
 ### Etap 6 — Pierwsze wdrożenie 🛑 (wymaga zatwierdzenia człowieka)
 - [ ] 🛑 Zatwierdzenie planu i uruchomienia wdrożenia prod.

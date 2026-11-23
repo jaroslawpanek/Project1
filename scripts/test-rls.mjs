@@ -1,5 +1,6 @@
 // RLS check for public.flashcards against a LOCAL Supabase (npx supabase start).
 // Usage: SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_KEY=<publishable key> node scripts/test-rls.mjs
+import { setTimeout as sleep } from "node:timers/promises";
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
@@ -33,7 +34,11 @@ const anon = mk();
 
 // A inserts own row
 const ins = await A.c.from("flashcards").insert({ front: "Q-A", back: "A-A" }).select().single();
-check("A can insert own row (user_id defaults to auth.uid())", !ins.error && ins.data?.user_id === A.id, ins.error?.message);
+check(
+  "A can insert own row (user_id defaults to auth.uid())",
+  !ins.error && ins.data?.user_id === A.id,
+  ins.error?.message,
+);
 const rowId = ins.data?.id;
 
 // A can read own row
@@ -74,7 +79,7 @@ check("front > 1000 chars rejected", !!long.error, long.error?.code);
 
 // updated_at trigger
 const before = ins.data.updated_at;
-await new Promise((r) => setTimeout(r, 50));
+await sleep(50);
 const upd = await A.c.from("flashcards").update({ back: "A-A2" }).eq("id", rowId).select().single();
 check("updated_at advances on update", upd.data && upd.data.updated_at > before);
 

@@ -10,6 +10,8 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
   site: "https://flashgen.jaroslaw-panek.workers.dev",
   output: "server",
+  // Auth uses Supabase cookies; Astro sessions are unused, so don't provision the SESSION KV namespace.
+  session: false,
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
