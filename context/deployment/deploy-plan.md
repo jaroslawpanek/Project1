@@ -72,10 +72,12 @@ Legenda: `[ ]` do zrobienia · `[x]` zrobione · 👤 = bramka ręczna (człowie
 - [x] Zdecydować o KV `SESSION`: **wyłączone** (`session: false` w `astro.config.mjs`; sesje Astro nieużywane). Oryginalna uwaga: adapter auto-provisionuje namespace przy deployu ([docs adaptera](https://docs.astro.build/en/guides/integrations-guide/cloudflare/)); sesje Astro nie są używane (auth to cookies Supabase) -> ustawić `session: false` / `cloudflare({ ... })` zgodnie z dokumentacją adaptera, aby nie tworzyć zbędnego zasobu.
 
 ### Etap 6 — Pierwsze wdrożenie 🛑 (wymaga zatwierdzenia człowieka)
-- [ ] 🛑 Zatwierdzenie planu i uruchomienia wdrożenia prod.
-- [ ] 🤖 `npm run build` → `npx wrangler deploy` (**nie** `wrangler pages deploy`).
-- [ ] 🤖 Zanotować URL `https://flashgen.<subdomena>.workers.dev`, wpisać do Site URL w Supabase (Etap 2) i do `site` w `astro.config.mjs`.
-- [ ] 🤖 `npx wrangler deployments list --json` — zapisać ID wersji jako punkt rollbacku.
+- [x] 🛑 Zatwierdzenie planu i uruchomienia wdrożenia prod. Zatwierdził użytkownik; deploy uruchomił użytkownik (`! npm run build && npx wrangler deploy`), bo klasyfikator uprawnień zablokował agentowi `wrangler deploy` (zgodnie z regułą: deploy prod robi człowiek).
+- [x] 🤖 `npm run build` → `npx wrangler deploy` (**nie** `wrangler pages deploy`). Wdrożono 2026-11-23, wersja `3661e6b9-25ec-4c65-8d2f-6b2257da7f8a`, start Workera 23 ms, bindingi `ASSETS`, `IMAGES`.
+- [x] 🤖 Zanotować URL `https://flashgen.<subdomena>.workers.dev`, wpisać do Site URL w Supabase (Etap 2) i do `site` w `astro.config.mjs`. URL: `https://flashgen.jaroslaw-panek.workers.dev` (`site` już ustawione). **Site URL w Supabase: wciąż do ustawienia przez człowieka (Etap 2).**
+- [x] 🤖 `npx wrangler deployments list --json` — zapisać ID wersji jako punkt rollbacku. Aktywna: `3661e6b9-…`. Uwaga: poprzednia wersja `738abd14-0399-4ffb-b63f-9373c7b52261` to pusty Worker utworzony przez `secret bulk` (same sekrety, bez kodu) — **nie jest sensownym celem rollbacku**; realny rollback będzie możliwy dopiero po kolejnym deployu.
+- [x] 🤖 Weryfikacja read-only na prod: `/` 200; `/dashboard` bez sesji 302 `/auth/signin`; `POST /api/flashcards/generate` bez sesji 401; logowanie nieistniejącym użytkownikiem zwraca „Invalid login credentials” z Supabase, czyli sekrety `astro:env/server` są widoczne w runtime (issue #16790 nie wystąpił).
+- [ ] 🤖 Ostrzeżenie wranglera: `workers_dev` i Preview URLs są domyślnie włączone (brak w `wrangler.jsonc`). Zdecydować, czy ustawić `preview_urls = false` (preview URL udostępnia Workera z tymi samymi sekretami).
 - [ ] 🤖 Ręcznie przejść ścieżkę: `/` → rejestracja → login → `/dashboard` → generowanie → zapis → "Moje fiszki".
 - [ ] 🤖 Smoke na prod: `BASE_URL=<adres> npm run smoke`. **Uwaga brzegowa:** smoke tworzy prawdziwe konta w prod Supabase i zakłada brak potwierdzenia e-mail; przy włączonym potwierdzeniu krok „signin accepts correct password” zawiedzie. Rozwiązanie: osobny projekt Supabase „staging” dla smoke, albo wariant smoke tylko-do-odczytu na prod (`/`, redirect `/dashboard`) i sprzątanie kont testowych.
 - [ ] 🤖 `npx wrangler tail --format json --status error` podczas testu — brak błędów CPU/subrequest.
