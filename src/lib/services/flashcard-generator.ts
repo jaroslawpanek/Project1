@@ -3,11 +3,11 @@ import type { FlashcardProposalDto } from "@/types";
 
 // Models are tried in order. The fallback is used only when the previous model is overloaded or times out
 // (Gemini returns intermittent 503s under high demand). Swap names here if newer models are preferred.
-// The main model usually needs 20-30 s, the lite one 1-6 s, hence different per-attempt timeouts.
-// Worst case (every attempt times out) is the sum of the timeouts, so keep it around 60 s.
+// The lite model is the main one (1-6 s); the full Flash model is the fallback (usually 20-30 s), hence
+// different per-attempt timeouts. Worst case (every attempt times out) is the sum, so keep it around 60 s.
 const MODELS = [
-  { name: "gemini-3.5-flash", timeoutMs: 40_000 },
   { name: "gemini-3.5-flash-lite", timeoutMs: 20_000 },
+  { name: "gemini-3.5-flash", timeoutMs: 40_000 },
 ] as const;
 const endpoint = (model: string) => `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 const MAX_PROPOSALS = 20;
