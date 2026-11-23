@@ -3,10 +3,13 @@ import type { FlashcardProposalDto } from "@/types";
 
 // Models are tried in order. The fallback is used only when the previous model is overloaded or times out
 // (Gemini returns intermittent 503s under high demand). Swap names here if newer models are preferred.
-const MODELS = ["gemini-3.5-flash", "gemini-3.5-flash-lite"] as const;
+// The main model usually needs 20-30 s, the lite one 1-6 s, hence different per-attempt timeouts.
+// Worst case (every attempt times out) is the sum of the timeouts, so keep it around 60 s.
+const MODELS = [
+  { name: "gemini-3.5-flash", timeoutMs: 40_000 },
+  { name: "gemini-3.5-flash-lite", timeoutMs: 20_000 },
+] as const;
 const endpoint = (model: string) => `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-// Per attempt. Worst case (every attempt times out) is MODELS.length * ATTEMPT_TIMEOUT_MS, so keep it under ~60 s total.
-const ATTEMPT_TIMEOUT_MS = 30_000;
 const MAX_PROPOSALS = 20;
 // HTTP statuses that mean "try the next model": rate limit and overload / gateway problems.
 const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
@@ -48,10 +51,14 @@ export class GenerationError extends Error {
 }
 
 /** One request to one model; returns validated proposals. Throws GenerationError. */
-async function requestModel(model: string, sourceText: string, apiKey: string): Promise<FlashcardProposalDto[]> {
+async function requestModel(
+  model: (typeof MODELS)[number],
+  sourceText: string,
+  apiKey: string,
+): Promise<FlashcardProposalDto[]> {
   let res: Response;
   try {
-    res = await fetch(endpoint(model), {
+    res = await fetch(endpoint(model.name), {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
@@ -75,7 +82,7 @@ async function requestModel(model: string, sourceText: string, apiKey: string): 
           },
         },
       }),
-      signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
+      signal: AbortSignal.timeout(model.timeoutMs),
     });
   } catch (err) {
     if (err instanceof DOMException && (err.name === "TimeoutError" || err.name === "AbortError")) {
@@ -117,6 +124,9 @@ export async function generateFlashcards(sourceText: string, apiKey: string): Pr
     } catch (err) {
       if (!(err instanceof GenerationError)) throw err;
       lastError = err;
+      // Visible in `wrangler tail` / Workers Logs; never includes the key or the provider response body.
+      // eslint-disable-next-line no-console -- intentional server-side diagnostics
+      console.error(`[flashcard-generator] ${model.name}: ${err.message} (retryable=${String(err.retryable)})`);
       if (!err.retryable) break;
     }
   }
