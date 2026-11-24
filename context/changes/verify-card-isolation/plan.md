@@ -210,13 +210,13 @@ No schema or data migration. Production data is left as it was: the script remov
 
 #### Automated
 
-- [x] 2.1 Default smoke still passes locally after build and preview: `npm run build` then `npm run preview`, then `npm run smoke` (8/8).
-- [x] 2.2 Read-only mode passes locally: `SMOKE_READONLY=1 npm run smoke`.
-- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Default smoke still passes locally after build and preview: `npm run build` then `npm run preview`, then `npm run smoke` (8/8). — 288a945
+- [x] 2.2 Read-only mode passes locally: `SMOKE_READONLY=1 npm run smoke`. — 288a945
+- [x] 2.3 Linting passes: `npm run lint` — 288a945
 
 #### Manual
 
-- [x] 2.4 Read-only mode against the production URL passes and creates no new accounts in the Supabase Auth user list.
+- [x] 2.4 Read-only mode against the production URL passes and creates no new accounts in the Supabase Auth user list. — 288a945
 
 ### Phase 3: Production run and recorded result
 
