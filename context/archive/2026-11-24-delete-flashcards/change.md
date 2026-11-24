@@ -1,10 +1,10 @@
 ---
 change_id: delete-flashcards
 title: Delete flashcards
-status: implemented
+status: archived
 created: 2026-11-24
 updated: 2026-11-24
-archived_at: null
+archived_at: 2026-11-24T13:18:49Z
 ---
 
 ## Notes
