@@ -145,14 +145,14 @@ Nie dotyczy (bez zmian schematu). Wdrożenie poprawek na produkcję zatwierdza c
 
 #### Automated
 
-- [ ] 1.1 Raport istnieje: `test -f context/changes/review-delete-flashcards/reviews/impl-review.md`
-- [ ] 1.2 Raport nie ma nierozstrzygniętych ustaleń: `! grep -q "Decision\*\*: PENDING" context/changes/review-delete-flashcards/reviews/impl-review.md`
-- [ ] 1.3 Zakres przeglądu to właściwe commity: `git log --oneline 6d3eb51^..8739c89 -- src scripts context/deployment`
+- [x] 1.1 Raport istnieje: `test -f context/changes/review-delete-flashcards/reviews/impl-review.md` — 8b0ab64
+- [x] 1.2 Raport nie ma nierozstrzygniętych ustaleń: `! grep -q "Decision\*\*: PENDING" context/changes/review-delete-flashcards/reviews/impl-review.md` — 8b0ab64
+- [x] 1.3 Zakres przeglądu to właściwe commity: `git log --oneline 6d3eb51^..8739c89 -- src scripts context/deployment` — 8b0ab64
 
 #### Manual
 
-- [ ] 1.4 Raport wymienia dokładnie commity `6d3eb51`, `2ba969e`, `8739c89` jako zakres przeglądu
-- [ ] 1.5 Triage zakończony: każde ustalenie ma decyzję (naprawić, pominąć, zaakceptować ryzyko albo zapisać jako lekcję)
+- [x] 1.4 Raport wymienia dokładnie commity `6d3eb51`, `2ba969e`, `8739c89` jako zakres przeglądu — 8b0ab64
+- [x] 1.5 Triage zakończony: każde ustalenie ma decyzję (naprawić, pominąć, zaakceptować ryzyko albo zapisać jako lekcję) — 8b0ab64
 
 ### Phase 2: Apply triage fixes
 
