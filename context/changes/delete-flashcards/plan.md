@@ -268,10 +268,10 @@ None. No schema, policy or data changes; rollback is a Worker rollback and needs
 
 #### Automated
 
-- [x] 3.1 Read-only smoke passes against production (3 earlier steps plus the anonymous delete 401): `SMOKE_READONLY=1 BASE_URL=<prod> npm run smoke`
+- [x] 3.1 Read-only smoke passes against production (3 earlier steps plus the anonymous delete 401): `SMOKE_READONLY=1 BASE_URL=<prod> npm run smoke` — 8739c89
 
 #### Manual
 
-- [x] 3.2 Single delete with inline confirmation works on production.
-- [x] 3.3 Bulk delete with inline confirmation works on production and leaves no test cards behind.
-- [x] 3.4 `deploy-plan.md` records the new version and the results.
+- [x] 3.2 Single delete with inline confirmation works on production. — 8739c89
+- [x] 3.3 Bulk delete with inline confirmation works on production and leaves no test cards behind. — 8739c89
+- [x] 3.4 `deploy-plan.md` records the new version and the results. — 8739c89
