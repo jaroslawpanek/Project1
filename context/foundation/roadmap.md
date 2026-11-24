@@ -45,7 +45,7 @@ Osoba uczy się do egzaminu i ma surowy tekst zamiast gotowych fiszek; ręczne d
 | S-02 | generate-card-proposals   | wkleić tekst źródłowy i dostać propozycje fiszek (przód/tył)      | S-01          | FR-002, FR-003, US-01     | done   |
 | S-03 | review-and-save-cards     | przejrzeć propozycje, odznaczyć, poprawić i zapisać wybrane       | S-02          | FR-004, FR-005, FR-006, US-01 | done |
 | S-04 | my-flashcards-view        | wejść w „Moje fiszki” i zobaczyć wszystkie swoje fiszki           | S-03          | FR-007                    | done   |
-| S-05 | delete-flashcards         | skasować niechciane fiszki                                        | S-04          | FR-008                    | ready  |
+| S-05 | delete-flashcards         | skasować niechciane fiszki                                        | S-04          | FR-008                    | in-progress |
 | S-06 | verify-card-isolation     | mieć pewność, że jego fiszki są niewidoczne dla innego konta      | S-04          | US-01, FR-006, FR-007     | done |
 
 ## Baseline
@@ -125,7 +125,7 @@ Brak. Wszystkie warstwy istnieją, a żadna praca przekrojowa nie jest potrzebna
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Jedyny niezaimplementowany wymóg PRD; dotyka danych użytkownika, więc usuwanie musi działać tylko na własnych fiszkach.
-- **Status:** ready
+- **Status:** in-progress
 
 ### S-06: Potwierdzona izolacja fiszek między kontami
 
