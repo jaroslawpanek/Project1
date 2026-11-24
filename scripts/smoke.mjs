@@ -20,43 +20,80 @@ function storeCookies(response) {
   }
 }
 
-async function request(path, { method = "GET", form } = {}) {
+async function request(path, { method = "GET", form, json } = {}) {
+  let body;
+  let contentType;
+  if (json !== undefined) {
+    body = JSON.stringify(json);
+    contentType = "application/json";
+  } else if (form) {
+    body = new URLSearchParams(form).toString();
+    contentType = "application/x-www-form-urlencoded";
+  }
   const response = await fetch(BASE_URL + path, {
     method,
     redirect: "manual",
     headers: {
       Cookie: cookieHeader(),
       Origin: BASE_URL,
-      ...(form ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+      ...(contentType ? { "Content-Type": contentType } : {}),
     },
-    body: form ? new URLSearchParams(form).toString() : undefined,
+    body,
   });
   storeCookies(response);
   return { status: response.status, location: response.headers.get("location") ?? "" };
 }
 
-const steps = [
-  ["home renders", () => request("/"), { status: 200 }],
-  ["dashboard redirects anonymous user", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+// SMOKE_READONLY=1 runs only the steps that need no account (safe against production).
+const READONLY = process.env.SMOKE_READONLY === "1";
+
+// Each step: [name, run, expected, mode] where mode is "all" (default), "readonly" (read-only mode only) or
+// "write" (default mode only; creates an account).
+const allSteps = [
+  ["home renders", () => request("/"), { status: 200 }, "all"],
+  ["dashboard redirects anonymous user", () => request("/dashboard"), { status: 302, location: "/auth/signin" }, "all"],
+  [
+    "generate API rejects anonymous user",
+    () => request("/api/flashcards/generate", { method: "POST", json: { text: "smoke" } }),
+    { status: 401 },
+    "readonly",
+  ],
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
     { status: 302, location: "/auth/confirm-email" },
+    "write",
   ],
   [
     "signin rejects wrong password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password: "wrong" } }),
     { status: 302, location: "/auth/signin?error=" },
+    "write",
   ],
   [
     "signin accepts correct password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
     { status: 302, location: "/" },
+    "write",
   ],
-  ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }],
-  ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
-  ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }, "write"],
+  [
+    "signout clears session",
+    () => request("/api/auth/signout", { method: "POST" }),
+    { status: 302, location: "/" },
+    "write",
+  ],
+  [
+    "dashboard redirects after signout",
+    () => request("/dashboard"),
+    { status: 302, location: "/auth/signin" },
+    "write",
+  ],
 ];
+
+const steps = allSteps.filter(([, , , mode]) => mode === "all" || mode === (READONLY ? "readonly" : "write"));
+
+console.log(`Smoke mode: ${READONLY ? "read-only (no accounts created)" : "default"}  target: ${BASE_URL}`);
 
 let failed = 0;
 for (const [name, run, expected] of steps) {

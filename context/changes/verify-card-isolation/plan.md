@@ -198,25 +198,25 @@ No schema or data migration. Production data is left as it was: the script remov
 
 #### Automated
 
-- [x] 1.1 Local run still passes all checks against a local Supabase: `SUPABASE_KEY=<local key> node scripts/test-rls.mjs`
-- [x] 1.2 Remote mode refuses to run without the flag, with a non-https URL, with missing credentials, or when A and B are the same account (negative cases exit non-zero with a clear message).
-- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Local run still passes all checks against a local Supabase: `SUPABASE_KEY=<local key> node scripts/test-rls.mjs` — 9de0d3a
+- [x] 1.2 Remote mode refuses to run without the flag, with a non-https URL, with missing credentials, or when A and B are the same account (negative cases exit non-zero with a clear message). — 9de0d3a
+- [x] 1.3 Linting passes: `npm run lint` — 9de0d3a
 
 #### Manual
 
-- [x] 1.4 Read the diff: the local-only guard is still the default path and the remote path cannot be entered by accident.
+- [x] 1.4 Read the diff: the local-only guard is still the default path and the remote path cannot be entered by accident. — 9de0d3a
 
 ### Phase 2: Read-only smoke mode
 
 #### Automated
 
-- [ ] 2.1 Default smoke still passes locally after build and preview: `npm run build` then `npm run preview`, then `npm run smoke` (8/8).
-- [ ] 2.2 Read-only mode passes locally: `SMOKE_READONLY=1 npm run smoke`.
-- [ ] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Default smoke still passes locally after build and preview: `npm run build` then `npm run preview`, then `npm run smoke` (8/8).
+- [x] 2.2 Read-only mode passes locally: `SMOKE_READONLY=1 npm run smoke`.
+- [x] 2.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.4 Read-only mode against the production URL passes and creates no new accounts in the Supabase Auth user list.
+- [x] 2.4 Read-only mode against the production URL passes and creates no new accounts in the Supabase Auth user list.
 
 ### Phase 3: Production run and recorded result
 
