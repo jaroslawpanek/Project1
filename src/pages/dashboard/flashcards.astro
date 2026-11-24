@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import FlashcardList from "@/components/FlashcardList";
 import { createClient } from "@/lib/supabase";
 
 // /dashboard/* is protected in src/middleware.ts; RLS limits rows to the signed-in user.
@@ -28,18 +29,7 @@ const flashcards = data ?? [];
         </p>
       )}
 
-      {!error && flashcards.length === 0 && (
-        <p class="text-blue-100/70">Nie masz jeszcze fiszek. Wygeneruj pierwsze z wklejonego tekstu.</p>
-      )}
-
-      <ul class="space-y-3">
-        {flashcards.map((card) => (
-          <li class="rounded-xl border border-white/10 bg-white/5 p-4">
-            <p class="font-medium">{card.front}</p>
-            <p class="mt-2 text-sm text-blue-100/70">{card.back}</p>
-          </li>
-        ))}
-      </ul>
+      <FlashcardList initialCards={flashcards} loadFailed={!!error} client:load />
     </div>
   </div>
 </Layout>

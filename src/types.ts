@@ -11,6 +11,11 @@ export interface GenerateFlashcardsResponseDto {
   proposals: FlashcardProposalDto[];
 }
 
+/** A saved flashcard as shown in the "Moje fiszki" list. */
+export interface FlashcardDto extends FlashcardProposalDto {
+  id: string;
+}
+
 export interface DeleteFlashcardsResponseDto {
   deleted: number;
 }

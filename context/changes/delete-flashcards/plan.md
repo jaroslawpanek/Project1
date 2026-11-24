@@ -238,31 +238,31 @@ None. No schema, policy or data changes; rollback is a Worker rollback and needs
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npx astro check`
-- [x] 1.2 Linting passes: `npm run lint`
-- [x] 1.3 Build succeeds: `npm run build`
-- [x] 1.4 Read-only smoke passes locally, including the new 401 step: `SMOKE_READONLY=1 npm run smoke` (against a local preview)
+- [x] 1.1 Type checking passes: `npx astro check` — 6d3eb51
+- [x] 1.2 Linting passes: `npm run lint` — 6d3eb51
+- [x] 1.3 Build succeeds: `npm run build` — 6d3eb51
+- [x] 1.4 Read-only smoke passes locally, including the new 401 step: `SMOKE_READONLY=1 npm run smoke` (against a local preview) — 6d3eb51
 
 #### Manual
 
-- [x] 1.5 Read the route: no `user_id` is trusted from the client, the count comes from rows actually deleted, and every status code matches the contract.
+- [x] 1.5 Read the route: no `user_id` is trusted from the client, the count comes from rows actually deleted, and every status code matches the contract. — 6d3eb51
 
 ### Phase 2: Interactive "Moje fiszki" list
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `npx astro check`
-- [ ] 2.2 Linting passes: `npm run lint`
-- [ ] 2.3 Build succeeds: `npm run build`
-- [ ] 2.4 Default smoke passes against a local-Supabase build, including save → delete 200 → delete 404: `npm run smoke`
-- [ ] 2.5 Read-only smoke still passes: `SMOKE_READONLY=1 npm run smoke`
-- [ ] 2.6 Local RLS script still passes: `SUPABASE_KEY=<local key> node scripts/test-rls.mjs`
+- [x] 2.1 Type checking passes: `npx astro check`
+- [x] 2.2 Linting passes: `npm run lint`
+- [x] 2.3 Build succeeds: `npm run build`
+- [x] 2.4 Default smoke passes against a local-Supabase build, including save → delete 200 → delete 404: `npm run smoke`
+- [x] 2.5 Read-only smoke still passes: `SMOKE_READONLY=1 npm run smoke`
+- [x] 2.6 Local RLS script still passes: `SUPABASE_KEY=<local key> node scripts/test-rls.mjs`
 
 #### Manual
 
-- [ ] 2.7 In a browser against the local build, deleting one card shows "Na pewno? Tak / Nie", "Nie" cancels, "Tak" removes only that card without a page reload.
-- [ ] 2.8 Selecting several cards and using the bulk action asks for confirmation with the correct count and removes exactly the selected cards.
-- [ ] 2.9 With no cards left, the empty-state message appears.
+- [x] 2.7 In a browser against the local build, deleting one card shows "Na pewno? Tak / Nie", "Nie" cancels, "Tak" removes only that card without a page reload.
+- [x] 2.8 Selecting several cards and using the bulk action asks for confirmation with the correct count and removes exactly the selected cards.
+- [x] 2.9 With no cards left, the empty-state message appears.
 
 ### Phase 3: Production release and verification
 

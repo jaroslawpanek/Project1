@@ -41,8 +41,11 @@ async function request(path, { method = "GET", form, json } = {}) {
     body,
   });
   storeCookies(response);
-  return { status: response.status, location: response.headers.get("location") ?? "" };
+  return { status: response.status, location: response.headers.get("location") ?? "", body: await response.text() };
 }
+
+// Id of the card saved during the write-mode steps; read from the rendered list and reused by the delete steps.
+let cardId;
 
 // SMOKE_READONLY=1 runs only the steps that need no account (safe against production).
 const READONLY = process.env.SMOKE_READONLY === "1";
@@ -87,6 +90,39 @@ const allSteps = [
     "write",
   ],
   ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }, "write"],
+  [
+    "save API stores a flashcard",
+    () =>
+      request("/api/flashcards", {
+        method: "POST",
+        json: { flashcards: [{ front: "smoke front", back: "smoke back" }] },
+      }),
+    { status: 201 },
+    "write",
+  ],
+  [
+    "my flashcards lists the saved card",
+    async () => {
+      const res = await request("/dashboard/flashcards");
+      cardId = /data-flashcard-id="([0-9a-f-]{36})"/.exec(res.body)?.[1];
+      // Report an impossible status when no card id was found, so the delete steps below fail loudly.
+      return cardId ? res : { ...res, status: 0 };
+    },
+    { status: 200 },
+    "write",
+  ],
+  [
+    "delete API deletes the card",
+    () => request("/api/flashcards", { method: "DELETE", json: { ids: [cardId] } }),
+    { status: 200 },
+    "write",
+  ],
+  [
+    "delete API returns 404 for the deleted card",
+    () => request("/api/flashcards", { method: "DELETE", json: { ids: [cardId] } }),
+    { status: 404 },
+    "write",
+  ],
   [
     "signout clears session",
     () => request("/api/auth/signout", { method: "POST" }),
