@@ -1,7 +1,7 @@
 ---
 change_id: review-delete-flashcards
 title: Przegląd kodu zmiany delete-flashcards
-status: planned
+status: impl_reviewed
 created: 2026-11-24
 updated: 2026-11-24
 archived_at: null
