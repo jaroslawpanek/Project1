@@ -11,6 +11,10 @@ export interface GenerateFlashcardsResponseDto {
   proposals: FlashcardProposalDto[];
 }
 
+export interface DeleteFlashcardsResponseDto {
+  deleted: number;
+}
+
 export interface ApiErrorDto {
   error: string;
 }

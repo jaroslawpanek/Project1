@@ -59,6 +59,16 @@ const allSteps = [
     "readonly",
   ],
   [
+    "delete API rejects anonymous user",
+    () =>
+      request("/api/flashcards", {
+        method: "DELETE",
+        json: { ids: ["00000000-0000-4000-8000-000000000000"] },
+      }),
+    { status: 401 },
+    "readonly",
+  ],
+  [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
     { status: 302, location: "/auth/confirm-email" },
