@@ -59,7 +59,7 @@ Co już jest w kodzie na dzień `2026-11-24` (zbadane automatycznie i potwierdzo
 - **Deploy / infra:** present — produkcja działa (`context/deployment/deploy-plan.md`); w CI nie ma joba wdrożenia.
 - **Observability:** partial — tylko `console.error` i `wrangler tail`, bez osobnego narzędzia.
 
-Statusy `done` przy S-01…S-04 wynikają z tego punktu bazowego i z przejścia ścieżki na produkcji (deploy-plan, Etap 6); te wycinki nie przeszły przez `/10x-archive`, więc sekcja `## Done` pozostaje pusta.
+Statusy `done` przy S-01…S-04 wynikają z tego punktu bazowego i z przejścia ścieżki na produkcji (deploy-plan, Etap 6); te wycinki nie przeszły przez `/10x-archive`, więc nie mają wpisów w `## Done` (jest tam tylko S-06).
 
 ## Foundations
 
@@ -121,7 +121,7 @@ Brak. Wszystkie warstwy istnieją, a żadna praca przekrojowa nie jest potrzebna
 - **Change ID:** delete-flashcards
 - **PRD refs:** FR-008
 - **Prerequisites:** S-04
-- **Parallel with:** S-06
+- **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Jedyny niezaimplementowany wymóg PRD; dotyka danych użytkownika, więc usuwanie musi działać tylko na własnych fiszkach.
@@ -135,8 +135,7 @@ Brak. Wszystkie warstwy istnieją, a żadna praca przekrojowa nie jest potrzebna
 - **Prerequisites:** S-04
 - **Parallel with:** S-05
 - **Blockers:** —
-- **Unknowns:**
-  - Jak uruchomić smoke na produkcji przy włączonym potwierdzaniu e-mail (osobny projekt testowy czy wariant tylko do odczytu)? — Owner: user. Block: no.
+- **Unknowns:** —
 - **Risk:** Guardrail PRD sprawdzony dotąd tylko lokalnie; weryfikacja na produkcji domyka to ryzyko przed zamknięciem kamienia milowego.
 - **Status:** done
 
@@ -149,7 +148,7 @@ Brak. Wszystkie warstwy istnieją, a żadna praca przekrojowa nie jest potrzebna
 | S-03       | review-and-save-cards   | Przegląd i zapis wybranych fiszek                           | no                    | done, wdrożone                         |
 | S-04       | my-flashcards-view      | Widok „Moje fiszki”                                         | no                    | done, wdrożone                         |
 | S-05       | delete-flashcards       | Usuwanie fiszek                                             | yes                   | Run `/10x-plan delete-flashcards`      |
-| S-06       | verify-card-isolation   | Potwierdzenie izolacji fiszek między kontami na produkcji   | yes                   | Run `/10x-plan verify-card-isolation`  |
+| S-06       | verify-card-isolation   | Potwierdzenie izolacji fiszek między kontami na produkcji   | no                    | done, zarchiwizowane                   |
 
 ## Open Roadmap Questions
 
