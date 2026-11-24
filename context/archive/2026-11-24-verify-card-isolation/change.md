@@ -1,10 +1,10 @@
 ---
 change_id: verify-card-isolation
 title: Verify flashcard isolation between accounts
-status: implemented
+status: archived
 created: 2026-11-24
 updated: 2026-11-24
-archived_at: null
+archived_at: 2026-11-24T12:42:48Z
 ---
 
 ## Notes
