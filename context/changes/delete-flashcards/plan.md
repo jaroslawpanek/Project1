@@ -251,27 +251,27 @@ None. No schema, policy or data changes; rollback is a Worker rollback and needs
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npx astro check`
-- [x] 2.2 Linting passes: `npm run lint`
-- [x] 2.3 Build succeeds: `npm run build`
-- [x] 2.4 Default smoke passes against a local-Supabase build, including save → delete 200 → delete 404: `npm run smoke`
-- [x] 2.5 Read-only smoke still passes: `SMOKE_READONLY=1 npm run smoke`
-- [x] 2.6 Local RLS script still passes: `SUPABASE_KEY=<local key> node scripts/test-rls.mjs`
+- [x] 2.1 Type checking passes: `npx astro check` — 2ba969e
+- [x] 2.2 Linting passes: `npm run lint` — 2ba969e
+- [x] 2.3 Build succeeds: `npm run build` — 2ba969e
+- [x] 2.4 Default smoke passes against a local-Supabase build, including save → delete 200 → delete 404: `npm run smoke` — 2ba969e
+- [x] 2.5 Read-only smoke still passes: `SMOKE_READONLY=1 npm run smoke` — 2ba969e
+- [x] 2.6 Local RLS script still passes: `SUPABASE_KEY=<local key> node scripts/test-rls.mjs` — 2ba969e
 
 #### Manual
 
-- [x] 2.7 In a browser against the local build, deleting one card shows "Na pewno? Tak / Nie", "Nie" cancels, "Tak" removes only that card without a page reload.
-- [x] 2.8 Selecting several cards and using the bulk action asks for confirmation with the correct count and removes exactly the selected cards.
-- [x] 2.9 With no cards left, the empty-state message appears.
+- [x] 2.7 In a browser against the local build, deleting one card shows "Na pewno? Tak / Nie", "Nie" cancels, "Tak" removes only that card without a page reload. — 2ba969e
+- [x] 2.8 Selecting several cards and using the bulk action asks for confirmation with the correct count and removes exactly the selected cards. — 2ba969e
+- [x] 2.9 With no cards left, the empty-state message appears. — 2ba969e
 
 ### Phase 3: Production release and verification
 
 #### Automated
 
-- [ ] 3.1 Read-only smoke passes against production (3 earlier steps plus the anonymous delete 401): `SMOKE_READONLY=1 BASE_URL=<prod> npm run smoke`
+- [x] 3.1 Read-only smoke passes against production (3 earlier steps plus the anonymous delete 401): `SMOKE_READONLY=1 BASE_URL=<prod> npm run smoke`
 
 #### Manual
 
-- [ ] 3.2 Single delete with inline confirmation works on production.
-- [ ] 3.3 Bulk delete with inline confirmation works on production and leaves no test cards behind.
-- [ ] 3.4 `deploy-plan.md` records the new version and the results.
+- [x] 3.2 Single delete with inline confirmation works on production.
+- [x] 3.3 Bulk delete with inline confirmation works on production and leaves no test cards behind.
+- [x] 3.4 `deploy-plan.md` records the new version and the results.
