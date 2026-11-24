@@ -158,11 +158,11 @@ Nie dotyczy (bez zmian schematu). Wdrożenie poprawek na produkcję zatwierdza c
 
 #### Automated
 
-- [x] 2.1 Lint przechodzi: `node node_modules/eslint/bin/eslint.js .`
-- [x] 2.2 Build przechodzi: `npm run build`
-- [x] 2.3 Smoke w trybie tylko do odczytu przechodzi na lokalnym buildzie: `SMOKE_READONLY=1 npm run smoke`
+- [x] 2.1 Lint przechodzi: `node node_modules/eslint/bin/eslint.js .` — 4dd679f
+- [x] 2.2 Build przechodzi: `npm run build` — 4dd679f
+- [x] 2.3 Smoke w trybie tylko do odczytu przechodzi na lokalnym buildzie: `SMOKE_READONLY=1 npm run smoke` — 4dd679f
 
 #### Manual
 
-- [x] 2.4 Każde ustalenie oznaczone do naprawy ma wpis `FIXED` w raporcie przeglądu
-- [x] 2.5 Poprawiona ścieżka usuwania (pojedyncze i zbiorcze) działa na lokalnym buildzie, jeśli poprawki dotknęły UI lub API
+- [x] 2.4 Każde ustalenie oznaczone do naprawy ma wpis `FIXED` w raporcie przeglądu — 4dd679f
+- [x] 2.5 Poprawiona ścieżka usuwania (pojedyncze i zbiorcze) działa na lokalnym buildzie, jeśli poprawki dotknęły UI lub API — 4dd679f
