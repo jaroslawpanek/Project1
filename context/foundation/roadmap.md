@@ -46,7 +46,7 @@ Osoba uczy się do egzaminu i ma surowy tekst zamiast gotowych fiszek; ręczne d
 | S-03 | review-and-save-cards     | przejrzeć propozycje, odznaczyć, poprawić i zapisać wybrane       | S-02          | FR-004, FR-005, FR-006, US-01 | done |
 | S-04 | my-flashcards-view        | wejść w „Moje fiszki” i zobaczyć wszystkie swoje fiszki           | S-03          | FR-007                    | done   |
 | S-05 | delete-flashcards         | skasować niechciane fiszki                                        | S-04          | FR-008                    | ready  |
-| S-06 | verify-card-isolation     | mieć pewność, że jego fiszki są niewidoczne dla innego konta      | S-04          | US-01, FR-006, FR-007     | ready  |
+| S-06 | verify-card-isolation     | mieć pewność, że jego fiszki są niewidoczne dla innego konta      | S-04          | US-01, FR-006, FR-007     | in-progress |
 
 ## Baseline
 
@@ -138,7 +138,7 @@ Brak. Wszystkie warstwy istnieją, a żadna praca przekrojowa nie jest potrzebna
 - **Unknowns:**
   - Jak uruchomić smoke na produkcji przy włączonym potwierdzaniu e-mail (osobny projekt testowy czy wariant tylko do odczytu)? — Owner: user. Block: no.
 - **Risk:** Guardrail PRD sprawdzony dotąd tylko lokalnie; weryfikacja na produkcji domyka to ryzyko przed zamknięciem kamienia milowego.
-- **Status:** ready
+- **Status:** in-progress
 
 ## Backlog Handoff
 
