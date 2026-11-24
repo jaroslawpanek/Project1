@@ -222,11 +222,11 @@ No schema or data migration. Production data is left as it was: the script remov
 
 #### Automated
 
-- [ ] 3.1 Remote RLS script exits 0 against production with all checks passing: `RLS_TARGET=remote … node scripts/test-rls.mjs` (run by the human).
-- [ ] 3.2 Read-only smoke passes against production: `BASE_URL=<prod> SMOKE_READONLY=1 npm run smoke` (run by the human).
+- [x] 3.1 Remote RLS script exits 0 against production with all checks passing: `RLS_TARGET=remote … node scripts/test-rls.mjs` (run by the human).
+- [x] 3.2 Read-only smoke passes against production: `BASE_URL=<prod> SMOKE_READONLY=1 npm run smoke` (run by the human).
 
 #### Manual
 
-- [ ] 3.3 Account B's "Moje fiszki" shows none of account A's cards (private window).
-- [ ] 3.4 No leftover `[rls-test …]` rows remain in production after the run.
-- [ ] 3.5 `deploy-plan.md` is updated with the observed result.
+- [x] 3.3 Account B's "Moje fiszki" shows none of account A's cards (private window).
+- [x] 3.4 No leftover `[rls-test …]` rows remain in production after the run.
+- [x] 3.5 `deploy-plan.md` is updated with the observed result.
