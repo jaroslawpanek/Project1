@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import type { ApiErrorDto, FlashcardProposalDto, GenerateFlashcardsResponseDto } from "@/types";
+import { readError } from "@/lib/read-error";
+import type { FlashcardProposalDto, GenerateFlashcardsResponseDto } from "@/types";
 
 export interface ProposalItem extends FlashcardProposalDto {
   id: number;
@@ -7,11 +8,6 @@ export interface ProposalItem extends FlashcardProposalDto {
 }
 
 type Status = "idle" | "generating" | "saving" | "saved";
-
-async function readError(res: Response, fallback: string): Promise<string> {
-  const body = (await res.json().catch(() => null)) as ApiErrorDto | null;
-  return body?.error ?? fallback;
-}
 
 export function useFlashcardGenerator() {
   // The source text lives here and is never cleared on error, so the user can retry without pasting again.

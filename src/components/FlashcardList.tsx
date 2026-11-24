@@ -1,5 +1,6 @@
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { useFlashcardList } from "@/components/hooks/useFlashcardList";
+import { MAX_SELECTED, useFlashcardList } from "@/components/hooks/useFlashcardList";
 import { cn } from "@/lib/utils";
 import type { FlashcardDto } from "@/types";
 
@@ -9,9 +10,21 @@ interface FlashcardListProps {
   loadFailed?: boolean;
 }
 
+/** Shortens a card's front so it can be used inside an accessible name. */
+function label(front: string): string {
+  const text = front.trim().replace(/\s+/g, " ");
+  return text.length > 40 ? `${text.slice(0, 40)}…` : text;
+}
+
 export default function FlashcardList({ initialCards, loadFailed = false }: FlashcardListProps) {
   const { cards, selectedIds, confirming, busy, error, toggleSelected, requestConfirm, cancelConfirm, confirmDelete } =
     useFlashcardList(initialCards);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Only one confirmation is open at a time, so a single ref serves both the bulk and the per-card "Nie" button.
+  useEffect(() => {
+    if (confirming) cancelRef.current?.focus();
+  }, [confirming]);
 
   const selectedCount = selectedIds.length;
 
@@ -24,17 +37,21 @@ export default function FlashcardList({ initialCards, loadFailed = false }: Flas
       )}
 
       {selectedCount > 0 && (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {confirming?.kind === "bulk" ? (
-            <>
-              <span className="text-sm text-blue-100">Usunąć {selectedCount} fiszek?</span>
+            <div
+              role="group"
+              aria-label="Potwierdzenie usunięcia zaznaczonych fiszek"
+              className="flex items-center gap-2"
+            >
+              <span className="text-sm text-blue-100">Usunąć zaznaczone fiszki ({selectedCount})?</span>
               <Button variant="destructive" size="sm" onClick={confirmDelete} disabled={busy}>
                 Tak
               </Button>
-              <Button variant="outline" size="sm" onClick={cancelConfirm} disabled={busy}>
+              <Button ref={cancelRef} variant="outline" size="sm" onClick={cancelConfirm} disabled={busy}>
                 Nie
               </Button>
-            </>
+            </div>
           ) : (
             <Button
               variant="destructive"
@@ -46,6 +63,9 @@ export default function FlashcardList({ initialCards, loadFailed = false }: Flas
             >
               Usuń zaznaczone ({selectedCount})
             </Button>
+          )}
+          {selectedCount >= MAX_SELECTED && (
+            <span className="text-sm text-blue-100/70">Możesz zaznaczyć maksymalnie {MAX_SELECTED} fiszek naraz.</span>
           )}
         </div>
       )}
@@ -59,6 +79,7 @@ export default function FlashcardList({ initialCards, loadFailed = false }: Flas
           {cards.map((card) => {
             const selected = selectedIds.includes(card.id);
             const confirmingThis = confirming?.kind === "single" && confirming.id === card.id;
+            const name = label(card.front);
             return (
               <li
                 key={card.id}
@@ -70,7 +91,7 @@ export default function FlashcardList({ initialCards, loadFailed = false }: Flas
               >
                 <input
                   type="checkbox"
-                  aria-label="Zaznacz fiszkę"
+                  aria-label={`Zaznacz fiszkę: ${name}`}
                   className="mt-1"
                   checked={selected}
                   disabled={busy}
@@ -84,19 +105,37 @@ export default function FlashcardList({ initialCards, loadFailed = false }: Flas
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   {confirmingThis ? (
-                    <>
+                    <div
+                      role="group"
+                      aria-label={`Potwierdzenie usunięcia fiszki: ${name}`}
+                      className="flex items-center gap-2"
+                    >
                       <span className="text-sm text-blue-100">Na pewno?</span>
-                      <Button variant="destructive" size="sm" onClick={confirmDelete} disabled={busy}>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        aria-label={`Potwierdź usunięcie fiszki: ${name}`}
+                        onClick={confirmDelete}
+                        disabled={busy}
+                      >
                         Tak
                       </Button>
-                      <Button variant="outline" size="sm" onClick={cancelConfirm} disabled={busy}>
+                      <Button
+                        ref={cancelRef}
+                        variant="outline"
+                        size="sm"
+                        aria-label={`Anuluj usunięcie fiszki: ${name}`}
+                        onClick={cancelConfirm}
+                        disabled={busy}
+                      >
                         Nie
                       </Button>
-                    </>
+                    </div>
                   ) : (
                     <Button
                       variant="ghost"
                       size="sm"
+                      aria-label={`Usuń fiszkę: ${name}`}
                       onClick={() => {
                         requestConfirm({ kind: "single", id: card.id });
                       }}

@@ -1,11 +1,12 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase";
-import type { ApiErrorDto, DeleteFlashcardsResponseDto } from "@/types";
+import { MAX_DELETE_IDS } from "@/types";
+import type { ApiErrorDto, DeleteFlashcardsResponseDto, SaveFlashcardsResponseDto } from "@/types";
 
 export const prerender = false;
 
-const bodySchema = z.object({
+const saveBodySchema = z.object({
   flashcards: z
     .array(
       z.object({
@@ -21,10 +22,10 @@ const deleteBodySchema = z.object({
   ids: z
     .array(z.uuid("Nieprawidłowy identyfikator fiszki."))
     .min(1, "Wskaż co najmniej jedną fiszkę.")
-    .max(50, "Zbyt wiele fiszek naraz."),
+    .max(MAX_DELETE_IDS, "Zbyt wiele fiszek naraz."),
 });
 
-const json = (data: { saved: number } | DeleteFlashcardsResponseDto | ApiErrorDto, status = 200) =>
+const json = (data: SaveFlashcardsResponseDto | DeleteFlashcardsResponseDto | ApiErrorDto, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json" } });
 
 export const POST: APIRoute = async (context) => {
@@ -32,7 +33,7 @@ export const POST: APIRoute = async (context) => {
     return json({ error: "Musisz być zalogowany." }, 401);
   }
 
-  const parsed = bodySchema.safeParse(await context.request.json().catch(() => null));
+  const parsed = saveBodySchema.safeParse(await context.request.json().catch(() => null));
   if (!parsed.success) {
     return json({ error: parsed.error.issues[0]?.message ?? "Nieprawidłowe dane." }, 400);
   }
@@ -54,6 +55,15 @@ export const POST: APIRoute = async (context) => {
 export const DELETE: APIRoute = async (context) => {
   if (!context.locals.user) {
     return json({ error: "Musisz być zalogowany." }, 401);
+  }
+
+  // Checked after auth so anonymous requests keep getting 401.
+  const origin = context.request.headers.get("Origin");
+  if (origin && origin !== context.url.origin) {
+    return json({ error: "Niedozwolone źródło żądania." }, 403);
+  }
+  if (!context.request.headers.get("Content-Type")?.toLowerCase().startsWith("application/json")) {
+    return json({ error: "Nieprawidłowy typ zawartości żądania." }, 400);
   }
 
   const parsed = deleteBodySchema.safeParse(await context.request.json().catch(() => null));

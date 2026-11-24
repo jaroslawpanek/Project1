@@ -38,7 +38,7 @@
   - Tradeoff: Częściowy sukces między partiami wymaga obsługi błędów i rozbudowuje hook.
   - Confidence: MEDIUM — nie sprawdzono zachowania przy błędzie w środku serii.
   - Blind spot: Stan UI po nieudanej partii.
-- **Decision**: FIX QUEUED (Fix A: cap selection at 50) — apply in Phase 2
+- **Decision**: FIXED via Fix A (Phase 2): selection capped at 50 + hint
 
 ### F2 — Kontrolki usuwania nie mają odróżnialnych nazw, focus ginie
 
@@ -52,7 +52,7 @@
   - Tradeoff: Kilka drobnych edycji w jednym komponencie.
   - Confidence: HIGH — nazwy i usuwanie przycisku widać w kodzie.
   - Blind spot: Nie sprawdzono z prawdziwym czytnikiem ekranu.
-- **Decision**: FIX QUEUED — apply in Phase 2
+- **Decision**: FIXED (Phase 2)
 
 ### F3 — Smoke w trybie zapisu nie ma zabezpieczenia przed produkcją
 
@@ -66,7 +66,7 @@
   - Tradeoff: Jedna dodatkowa flaga dla świadomego zapisu na zdalnym środowisku.
   - Confidence: HIGH — wzorzec już istnieje w `test-rls.mjs`.
   - Blind spot: Czy README opisuje tryby i wymaga uzupełnienia.
-- **Decision**: FIX QUEUED — apply in Phase 2
+- **Decision**: FIXED (Phase 2)
 
 ### F4 — „Usunąć N fiszek?” bez odmiany
 
@@ -76,7 +76,7 @@
 - **Location**: src/components/FlashcardList.tsx:30
 - **Detail**: Tekst potwierdzenia zbiorczego to stałe „Usunąć {N} fiszek?”, więc dla 1 wychodzi „1 fiszek”, a dla 2–4 „2 fiszek” zamiast „fiszki”. To komunikat przy operacji destrukcyjnej. Plan opisywał ten tekst dosłownie, więc to wada planu, nie odchylenie.
 - **Fix**: Neutralne sformułowanie „Usunąć zaznaczone fiszki ({N})?” albo mały helper odmiany.
-- **Decision**: FIX QUEUED — apply in Phase 2
+- **Decision**: FIXED (Phase 2)
 
 ### F5 — Brak sprawdzania Origin/Content-Type w DELETE
 
@@ -86,7 +86,7 @@
 - **Location**: src/pages/api/flashcards/index.ts (DELETE)
 - **Detail**: Handler używa `request.json()` niezależnie od Content-Type, a Astro `checkOrigin` obejmuje tylko typy formularzy. Ryzyko jest niskie (ciasteczka Supabase SSR mają SameSite=Lax, a cross-site DELETE z JSON wymaga preflightu), ale obrona opiera się na atrybutach ciasteczek.
 - **Fix**: Opcjonalnie odrzucaj żądania, których Content-Type nie jest `application/json` lub Origin różni się od `url.origin`.
-- **Decision**: FIX QUEUED — apply in Phase 2
+- **Decision**: FIXED (Phase 2)
 
 ### F6 — Smoke nie sprawdza usuwania cudzej fiszki przez API
 
@@ -106,7 +106,7 @@
 - **Location**: src/components/hooks/useFlashcardList.ts:8, src/pages/api/flashcards/index.ts:8, :27
 - **Detail**: `readError` jest skopiowane słowo w słowo z `useFlashcardGenerator.ts:11`. Obok `deleteBodySchema` istniejące `bodySchema` jest niejednoznaczne, a `json()` ma w typie inline `{ saved: number }` bez DTO w `types.ts`, w przeciwieństwie do `DeleteFlashcardsResponseDto`.
 - **Fix**: Wyciągnij `readError` do `src/lib/`, zmień `bodySchema` na `saveBodySchema` i dodaj `SaveFlashcardsResponseDto`.
-- **Decision**: FIX QUEUED — apply in Phase 2
+- **Decision**: FIXED (Phase 2)
 
 ### F8 — Po 401 brak przekierowania, ignorowane `deleted`
 

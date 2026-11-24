@@ -16,6 +16,13 @@ export interface FlashcardDto extends FlashcardProposalDto {
   id: string;
 }
 
+/** Maximum number of flashcards accepted by a single DELETE /api/flashcards request. */
+export const MAX_DELETE_IDS = 50;
+
+export interface SaveFlashcardsResponseDto {
+  saved: number;
+}
+
 export interface DeleteFlashcardsResponseDto {
   deleted: number;
 }

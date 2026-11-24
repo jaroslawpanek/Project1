@@ -1,6 +1,8 @@
 // Smoke test: proves the built app, the Cloudflare adapter and the Supabase auth flow still work together.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
+import { URL } from "node:url";
+
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
@@ -49,6 +51,18 @@ let cardId;
 
 // SMOKE_READONLY=1 runs only the steps that need no account (safe against production).
 const READONLY = process.env.SMOKE_READONLY === "1";
+
+// Write mode creates accounts and data, so it only runs against a local server unless explicitly allowed.
+if (!READONLY && process.env.SMOKE_ALLOW_WRITE !== "1") {
+  const { hostname } = new URL(BASE_URL);
+  if (!["localhost", "127.0.0.1", "[::1]"].includes(hostname)) {
+    console.error(
+      `Refusing to run write-mode smoke against non-local host "${hostname}". ` +
+        "Use SMOKE_READONLY=1, or set SMOKE_ALLOW_WRITE=1 to override.",
+    );
+    process.exit(1);
+  }
+}
 
 // Each step: [name, run, expected, mode] where mode is "all" (default), "readonly" (read-only mode only) or
 // "write" (default mode only; creates an account).

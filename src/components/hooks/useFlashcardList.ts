@@ -1,14 +1,14 @@
 import { useCallback, useState } from "react";
-import type { ApiErrorDto, FlashcardDto } from "@/types";
+import { readError } from "@/lib/read-error";
+import { MAX_DELETE_IDS } from "@/types";
+import type { FlashcardDto } from "@/types";
 
 export type Confirming = null | { kind: "single"; id: string } | { kind: "bulk" };
 
 type Status = "idle" | "deleting";
 
-async function readError(res: Response, fallback: string): Promise<string> {
-  const body = (await res.json().catch(() => null)) as ApiErrorDto | null;
-  return body?.error ?? fallback;
-}
+/** Selection cap; equals the API limit (MAX_DELETE_IDS) so a bulk delete is never rejected as too large. */
+export const MAX_SELECTED = MAX_DELETE_IDS;
 
 export function useFlashcardList(initialCards: FlashcardDto[]) {
   const [cards, setCards] = useState<FlashcardDto[]>(initialCards);
@@ -18,7 +18,11 @@ export function useFlashcardList(initialCards: FlashcardDto[]) {
   const [error, setError] = useState<string | null>(null);
 
   const toggleSelected = useCallback((id: string) => {
-    setSelectedIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+    setSelectedIds((ids) => {
+      if (ids.includes(id)) return ids.filter((x) => x !== id);
+      // Selecting beyond the cap is ignored.
+      return ids.length >= MAX_SELECTED ? ids : [...ids, id];
+    });
     // A bulk confirmation names a count, so changing the selection invalidates it.
     setConfirming((current) => (current?.kind === "bulk" ? null : current));
   }, []);
